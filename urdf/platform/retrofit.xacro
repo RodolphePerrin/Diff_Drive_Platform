@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find diff_drive)/urdf/plugins/lidar.xacro"/>
+  <xacro:include filename="$(find diff_drive)/urdf/plugins/sensors_plugins.xacro"/>
+  <xacro:gazebo_realsense suffix="center"/>
+  <xacro:gazebo_realsense suffix="left"/>
+  <xacro:gazebo_realsense suffix="right"/>
+  <xacro:gazebo_realsense suffix="rear_right"/>
+  <xacro:gazebo_realsense suffix="rear_left"/>
+</robot>

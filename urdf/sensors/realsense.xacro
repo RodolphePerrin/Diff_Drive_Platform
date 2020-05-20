@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find diff_drive)/urdf/solids.xacro"/>
+
+  <xacro:property name="realsense_size_x" value="0.026"/>
+  <xacro:property name="realsense_size_y" value="0.064"/>
+  <xacro:property name="realsense_size_z" value="0.026"/>
+
+  <xacro:macro name="realsense" params="suffix parent:=body x y z roll pitch yaw">
+    <link name="camera_${suffix}_optical"/>
+    <link name="camera_${suffix}_imu"/>
+    <link name="camera_${suffix}">
+      <xacro:solid_box x="${realsense_size_x}" y="${realsense_size_y}" z="${realsense_size_z}" mass="0.072">
+        <color rgba="0.75 0.75 0.75 1.0"/>
+      </xacro:solid_box>
+    </link>
+    <joint name="camera_${suffix}_${parent}_joint" type="fixed">
+      <parent link="${parent}"/>
+      <child link="camera_${suffix}"/>
+      <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
+    </joint>
+    <joint name="camera_${suffix}_optical_joint" type="fixed">
+      <parent link="camera_${suffix}"/>
+      <child link="camera_${suffix}_optical"/>
+      <!--
+        Account for differences between camera and robot coordinate frames.
+        See: https://www.ros.org/reps/rep-0103.html#coordinate-frame-conventions
+      -->
+      <origin xyz="0 0 0" rpy="-1.5707963267948966 0.0 -1.5707963267948966"/>
+    </joint>
+    <joint name="camera_${suffix}_imu_joint" type="fixed">
+      <parent link="camera_${suffix}"/>
+      <child link="camera_${suffix}_imu"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+</robot>

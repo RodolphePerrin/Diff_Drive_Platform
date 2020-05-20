@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="solid" params="mass ixx iyy izz visible *shape *material">
+    <xacro:if value="${visible}">
+      <visual>
+        <geometry>
+          <xacro:insert_block name="shape"/>
+        </geometry>
+      </visual>
+    </xacro:if>
+    <collision>
+      <geometry>
+        <xacro:insert_block name="shape"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${mass}"/>
+      <inertia
+        ixx="${ixx}" ixy="0.0"    ixz="0.0"
+                     iyy="${iyy}" iyz="0.0"
+                                  izz="${izz}"
+      />
+    </inertial>
+    <material>
+      <xacro:insert_block name="material"/>
+    </material>
+  </xacro:macro>
+
+  <xacro:macro name="solid_box" params="x y z mass visible:=true *material">
+    <xacro:solid
+      mass="${mass}"
+      ixx="${0.0833333 * mass * (y*y + z*z)}"
+      iyy="${0.0833333 * mass * (x*x + z*z)}"
+      izz="${0.0833333 * mass * (x*x + y*y)}"
+      visible="${visible}"
+    >
+      <box size="${x} ${y} ${z}"/>
+      <xacro:insert_block name="material"/>
+    </xacro:solid>
+  </xacro:macro>
+
+  <xacro:macro name="solid_cylinder" params="radius length mass visible:=true *material">
+    <xacro:solid
+      mass="${mass}"
+      ixx="${0.0833333 * mass * (3 * radius * radius + length * length)}"
+      iyy="${0.0833333 * mass * (3 * radius * radius + length * length)}"
+      izz="${0.5 * mass * radius * radius}"
+      visible="${visible}"
+    >
+      <cylinder radius="${radius}" length="${length}"/>
+      <xacro:insert_block name="material"/>
+    </xacro:solid>
+  </xacro:macro>
+
+  <xacro:macro name="solid_sphere" params="radius mass visible:=true *material">
+    <xacro:solid
+      mass="${mass}"
+      ixx="${0.4 * mass * radius * radius}"
+      iyy="${0.4 * mass * radius * radius}"
+      izz="${0.4 * mass * radius * radius}"
+      visible="${visible}"
+    >
+      <sphere radius="${radius}"/>
+      <xacro:insert_block name="material"/>
+    </xacro:solid>
+  </xacro:macro>
+</robot>

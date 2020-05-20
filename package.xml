@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <!-- Package description -->
+  <name>diff_drive</name>
+  <version>0.1.0</version>
+  <description>Implementation of a simulated differential drive platform</description>
+  <maintainer email="rodolphe.perrin1@gmail.com">Rodolphe Perrin</maintainer>
+  <author email="rodolphe.perrin1@gmail.com">Rodolphe Perrin</author>
+  <license>Proprietary</license>
+  <url type="repository">https://github.com</url>
+
+  <!-- Compile-time and runtime dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>Eigen3</build_depend>
+</package>

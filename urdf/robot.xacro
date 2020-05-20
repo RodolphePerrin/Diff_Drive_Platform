@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Robot URDF files.
+
+  Author: Rodolphe Perrin
+-->
+
+<robot name="Differential" xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:include filename="$(find diff_drive)/urdf/body.xacro"/>
+    <xacro:include filename="$(find diff_drive)/urdf/sensors/cameras.xacro"/>
+    <xacro:include filename="$(find diff_drive)/urdf/sensors/lidar.xacro"/>
+    <xacro:include filename="$(find diff_drive)/urdf/sensors/imu.xacro"/>
+    <xacro:include filename="$(find diff_drive)/urdf/platform/platform.xacro"/>
+    <xacro:include filename="$(find diff_drive)/urdf/platform/retrofit.xacro"/>
+</robot>

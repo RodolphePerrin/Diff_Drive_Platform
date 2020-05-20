@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Author: Rodolphe Perrin
+-->
+
+<launch>
+
+  <arg name="description" default="robot_description"/>
+  <arg name="empty_world" value="$(find gazebo_ros)/worlds/empty.world"/>
+  
+  <!-- Start nodelet manager to run system nodelets. -->
+  <node name="robot" pkg="nodelet" type="nodelet" args="manager" respawn="true" output="screen"/>
+
+  <!-- Load the URDF into the ROS parameter server. -->
+  <param name="robot_description"
+    command="
+      xacro
+        --inorder '$(find diff_drive)/urdf/robot.xacro'
+    "
+  />
+
+  <!-- Keep track of the position of robot links relative to each other, publishing updates as TF transforms. -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+
+  <!-- Start world simulation as appropriate. -->
+  <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="true" output="screen" args="$(arg empty_world)">
+  </node>
+
+
+ <arg name="x" default="0"/>
+ <arg name="y" default="0"/>
+ <arg name="z" default="0"/>
+ <arg name="roll"  default="0"/>
+ <arg name="pitch" default="0"/>
+ <arg name="yaw"   default="0"/>
+
+ <!-- Send a service call to Gazebo to spawn a URDF robot. -->
+ <node name="spawn" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+   args="
+     -urdf -model differential -param $(arg description)
+     -x $(arg x)
+     -y $(arg y)
+     -z $(arg z)
+     -R $(arg roll)
+     -P $(arg pitch)
+     -Y $(arg yaw)
+   "
+</launch>
+

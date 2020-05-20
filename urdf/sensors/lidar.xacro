@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find whyvr)/urdf/solids.xacro"/>
+
+  <xacro:property name="body_height2" value="0.65"/>
+  <xacro:property name="pole_length2" value="0.23"/>
+    <xacro:property name="body_height" value="0.65"/>
+  <xacro:property name="pole_length" value="1.19"/>
+
+  <link name="lidar_pole">
+    <xacro:solid_cylinder radius="0.031" length="${pole_length}" mass="2.0">
+      <color rgba="0.75 0.75 0.75 1.0"/>
+    </xacro:solid_cylinder>
+  </link>
+  <joint name="pole_joint" type="fixed">
+    <parent link="body"/>
+    <child link="lidar_pole"/>
+    <origin xyz="-0.29 0.0 ${0.5 * (body_height + pole_length)}" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:property name="lidar_height" value="0.087"/>
+  <link name="lidar">
+    <xacro:solid_box x="0.062" y="0.062" z="${lidar_height}" mass="0.37">
+      <color rgba="0.25 0.25 0.25 1.0"/>
+    </xacro:solid_box>
+  </link>
+  <joint name="lidar_joint" type="fixed">
+    <parent link="lidar_pole"/>
+    <child link="lidar"/>
+    <origin xyz="0.0 0.0 ${0.5 * (pole_length + lidar_height)}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser"/>
+  <joint name="laser_joint" type="fixed">
+    <parent link="lidar"/>
+    <child link="laser"/>
+    <origin xyz="0 0 0.017" rpy="0 0 0"/>
+  </joint>
+  
+  <link name="3d_lidar_pole">
+    <xacro:solid_cylinder radius="0.031" length="${pole_length2}" mass="2.0">
+      <color rgba="0.75 0.75 0.75 1.0"/>
+    </xacro:solid_cylinder>
+  </link>
+  <joint name="3d_lidar_pole_joint" type="fixed">
+    <parent link="body"/>
+    <child link="3d_lidar_pole"/>
+    <origin xyz="-0.29 0.0 ${0.5 * (body_height2 + pole_length2)}" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:property name="lidar_height" value="0.087"/>
+  <link name="os1_sensor">
+    <xacro:solid_box x="0.062" y="0.062" z="${lidar_height}" mass="0.37">
+      <color rgba="0.25 0.25 0.25 1.0"/>
+    </xacro:solid_box>
+  </link>
+  <joint name="3d_lidar_joint" type="fixed">
+    <parent link="3d_lidar_pole"/>
+    <child link="os1_sensor"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="os1_lidar"/>
+  <joint name="3d_laser_joint" type="fixed">
+    <parent link="os1_sensor"/>
+    <child link="os1_lidar"/>
+    <origin xyz="0 0 0.017" rpy="0 0 3.20"/>
+  </joint> 
+</robot>

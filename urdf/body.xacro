@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+
+<!--
+  Generic diff_drive platform model.
+
+-->
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:include filename="$(find diff_drives)/urdf/solids.xacro"/>
+
+  <link name="base_footprint"/>
+
+  <link name="base_link"/>
+  <joint name="base_link_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0.0 0.0 0.17" rpy="0 0 0"/>
+  </joint>
+
+  <link name="body">
+    <xacro:solid_box x="0.45" y="0.36" z="0.45" mass="40.0">
+      <color rgba="0.25 0.25 0.25 1.0"/>
+    </xacro:solid_box>
+  </link>
+  <joint name="body_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="body"/>
+    <origin xyz="0.0 0.0 0.235" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:macro name="wheel" params="suffix x y z">
+    <link name="wheel_${suffix}">
+      <xacro:solid_cylinder radius="0.17" length="0.08" mass="1.0">
+        <color rgba="0.75 0.75 0.75 1.0"/>
+      </xacro:solid_cylinder>
+    </link>
+    <joint name="wheel_${suffix}_hinge" type="continuous">
+      <parent link="base_link"/>
+      <child link="wheel_${suffix}"/>
+      <origin xyz="${x} ${y} ${z}" rpy="-1.5707 0 0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:wheel suffix="left"  x="0.0" y="0.27" z="0.0"/>
+  <xacro:wheel suffix="right" x="0.0" y="-0.27" z="0.0"/>
+
+  <link name="casters_support">
+    <xacro:solid_box x="1.06" y="0.46" z="0.01" mass="0.1">
+      <color rgba="0.25 0.25 0.25 1.0"/>
+    </xacro:solid_box>
+  </link>
+  <joint name="casters_support_joint" type="fixed">
+    <parent link="body"/>
+    <child link="casters_support"/>
+    <origin xyz="0.0 0.0 -0.25" rpy="0 0 0" />
+  </joint>
+
+  <xacro:macro name="caster" params="suffix x y z">
+    <link name="caster_${suffix}">
+      <xacro:solid_sphere radius="0.075" mass="0.1" visible="false">
+        <color rgba="0.75 0.75 0.75 1.0"/>
+      </xacro:solid_sphere>
+      <visual>
+        <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+        <geometry>
+          <cylinder radius="0.075" length="0.08"/>
+        </geometry>
+      </visual>
+    </link>
+    <joint name="caster_${suffix}_joint" type="fixed">
+      <parent link="casters_support"/>
+      <child link="caster_${suffix}"/>
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:caster suffix="front_left"  x="0.455" y="0.19" z="-0.08"/>
+  <xacro:caster suffix="front_right" x="0.455" y="-0.19" z="-0.08"/>
+  <xacro:caster suffix="back_left"   x="-0.455" y="0.19" z="-0.08"/>
+  <xacro:caster suffix="back_right"  x="-0.455" y="-0.19" z="-0.08"/>
+</robot>

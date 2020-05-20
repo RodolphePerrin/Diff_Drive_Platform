@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <gazebo reference="body">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <gazebo reference="casters_support">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>20</updateRate>
+      <legacyMode>false</legacyMode>
+      <leftJoint>wheel_left_hinge</leftJoint>
+      <rightJoint>wheel_right_hinge</rightJoint>
+      <wheelSeparation>0.54</wheelSeparation>
+      <wheelDiameter>0.34</wheelDiameter>
+      <wheelAcceleration>0.5</wheelAcceleration>
+      <wheelTorque>10.0</wheelTorque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryFrame>odom</odometryFrame>
+      <odometryTopic>odom</odometryTopic>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <publishTf>true</publishTf>
+      <publishOdomTF>true</publishOdomTF>
+      <publishWheelTF>false</publishWheelTF>
+      <publishWheelJointState>true</publishWheelJointState>
+      <rosDebugLevel>na</rosDebugLevel>
+    </plugin>
+  </gazebo>
+
+  <xacro:macro name="gazebo_caster" params="suffix">
+    <gazebo reference="caster_${suffix}">
+      <collision>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.0</mu>
+              <mu2>0.0</mu2>
+              <slip1>1.0</slip1>
+              <slip2>1.0</slip2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:gazebo_caster suffix="front_left"/>
+  <xacro:gazebo_caster suffix="front_right"/>
+  <xacro:gazebo_caster suffix="back_left"/>
+  <xacro:gazebo_caster suffix="back_right"/>
+</robot>
