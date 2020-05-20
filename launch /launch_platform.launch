@@ -45,6 +45,10 @@
      -R $(arg roll)
      -P $(arg pitch)
      -Y $(arg yaw)
-   "
+       ">
+ </node>
+ 
+ <node name="gazebo_client" pkg="gazebo_ros" type="gzclient" respawn="true" output="screen"/>
+ 
 </launch>
 

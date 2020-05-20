@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find whyvr)/urdf/sensors/realsense.xacro"/>
+  <xacro:include filename="$(find diff_drive)/urdf/sensors/realsense.xacro"/>
   <xacro:realsense suffix="center" x="0.353" y="0" z="0.09" roll="3.1415" pitch="0.02" yaw="-0.05"/>
   <xacro:realsense suffix="left" x="0.458" y="0.42" z="-0.01" roll="0.04" pitch="-0.12" yaw="0.55"/>
   <xacro:realsense suffix="right" x="0.458" y="-0.42" z="0.01" roll="0.02" pitch="0.05" yaw="-0.4"/>

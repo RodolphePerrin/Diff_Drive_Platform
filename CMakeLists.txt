@@ -4,7 +4,7 @@ add_compile_options(-std=c++11)
 
 project(diff_drive)
 
- Set to Release in order to speed up the program significantly
+##Set to Release in order to speed up the program significantly
 set(CMAKE_BUILD_TYPE Release) #None, Debug, Release, RelWithDebInfo, MinSizeRel
 
 ## Find catkin macros and libraries

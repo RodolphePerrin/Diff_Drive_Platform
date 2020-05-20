@@ -5,7 +5,7 @@
 
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find diff_drives)/urdf/solids.xacro"/>
+  <xacro:include filename="$(find diff_drive)/urdf/solids.xacro"/>
 
   <link name="base_footprint"/>
 
