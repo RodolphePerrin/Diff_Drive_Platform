@@ -8,23 +8,44 @@ project(diff_drive)
 set(CMAKE_BUILD_TYPE Release) #None, Debug, Release, RelWithDebInfo, MinSizeRel
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS)
+find_package(catkin REQUIRED COMPONENTS
+  gazebo_plugins
+  nav_msgs
+  geometry_msgs
+
+
+)
+
+# Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+    "Encoders.msg"
+    )
+
+# Generate added messages and services with any dependencies listed here
+generate_messages(
+  DEPENDENCIES
+    geometry_msgs
+)
+
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 
-catkin_package()
 
-# catkin_package(
-#   INCLUDE_DIRS
-#     "include"
-#   LIBRARIES
-#     ${PROJECT_NAME}
-#   CATKIN_DEPENDS
-#     nodelet
-#     tf
-# )
+
+catkin_package(
+   INCLUDE_DIRS
+     "include"
+   LIBRARIES
+     ${PROJECT_NAME}
+     diff_drive_gazebo
+  CATKIN_DEPENDS
+     nodelet
+     tf
+     gazebo_plugins
+ )
 
 ###########
 ## Build ##
@@ -33,23 +54,19 @@ catkin_package()
 ## Specify additional locations of header files
 ## Package locations should be listed before other locations
 # include_directories(
-#   "include/"
-#   ${EXTERNAL_INCLUDE_DIRS}
-#   ${catkin_INCLUDE_DIRS}
-# )
+    "include/"
+    ${EXTERNAL_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+ )
 
-## Build the botn library
 
-# add_library(${PROJECT_NAME}
-#   "src/driver.cpp"
-# )
-#
-# add_dependencies(${PROJECT_NAME}
-#   ${${PROJECT_NAME}_EXPORTED_TARGETS}
-#   ${catkin_EXPORTED_TARGETS}
-# )
-#
-# target_link_libraries(${PROJECT_NAME}
-#   ${EXTERNAL_LIBS}
-#   ${catkin_LIBRARIES}
-# )
+## Build library diff_drive_gazebo
+
+add_library(diff_drive_gazebo
+  "src/diff_drive.cpp"
+)
+
+target_link_libraries(diff_drive_gazebo
+  ${Boost_LIBRARIES}
+  ${catkin_LIBRARIES}
+)

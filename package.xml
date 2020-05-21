@@ -12,4 +12,7 @@
   <!-- Compile-time and runtime dependencies -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>Eigen3</build_depend>
+  <depend>gazebo_plugins</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
 </package>
