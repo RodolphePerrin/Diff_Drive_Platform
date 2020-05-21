@@ -9,7 +9,7 @@
   </gazebo>
 
   <gazebo>
-    <plugin name="differential_drive_controller" filename="libdiff_drive_diff_drive.so">
+    <plugin name="differential_drive_controller" filename="libdiff_drive_gazebo.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>20</updateRate>
       <legacyMode>false</legacyMode>

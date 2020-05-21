@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_plugins
   nav_msgs
   geometry_msgs
+  gazebo_dev
+  message_generation
+  gazebo_msgs
 
 
 )
@@ -41,9 +44,7 @@ catkin_package(
    LIBRARIES
      ${PROJECT_NAME}
      diff_drive_gazebo
-  CATKIN_DEPENDS
-     nodelet
-     tf
+  CATKIN_DEPEND
      gazebo_plugins
  )
 
@@ -53,10 +54,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Package locations should be listed before other locations
-# include_directories(
+ include_directories(
     "include/"
     ${EXTERNAL_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
+    ${GAZEBO_INCLUDE_DIRS}
  )
 
 
@@ -66,7 +68,8 @@ add_library(diff_drive_gazebo
   "src/diff_drive.cpp"
 )
 
-target_link_libraries(diff_drive_gazebo
+target_link_libraries(diff_drive_gazebo 
   ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
+  ${GAZEBO_LIBRARIES}
 )

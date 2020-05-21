@@ -47,7 +47,7 @@
 #include <algorithm>
 #include <assert.h>
 
-#include <gazebo_plugins/gazebo_ros_diff_drive.h>
+#include <diff_drive.h>
 
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Pose3.hh>
@@ -267,7 +267,7 @@ void GazeboRosDiffDrive::UpdateChild()
     }
 
 
-    if ( odom_source_ == ENCODER ) UpdateOdometryEncoder();
+    
 #if GAZEBO_MAJOR_VERSION >= 8
     common::Time current_time = parent->GetWorld()->SimTime();
 #else
@@ -276,7 +276,10 @@ void GazeboRosDiffDrive::UpdateChild()
     double seconds_since_last_update = ( current_time - last_update_time_ ).Double();
 
     if ( seconds_since_last_update > update_period_ ) {
-        if (this->publish_tf_) publishOdometry ( seconds_since_last_update );
+        if (this->publish_tf_) 
+        {
+            publishOdometry ( seconds_since_last_update );
+            UpdateOdometryEncoder();}
         if ( publishWheelTF_ ) publishWheelTF();
         if ( publishWheelJointState_ ) publishWheelJointState();
 
@@ -362,6 +365,8 @@ void GazeboRosDiffDrive::QueueThread()
 
 void GazeboRosDiffDrive::UpdateOdometryEncoder()
 {
+    std::string odom_frame = gazebo_ros_->resolveTF ( odometry_frame_ );
+    std::string base_footprint_frame = gazebo_ros_->resolveTF ( robot_base_frame_ );
     double vl = joints_[LEFT]->GetVelocity ( 0 );
     double vr = joints_[RIGHT]->GetVelocity ( 0 );
 #if GAZEBO_MAJOR_VERSION >= 8
@@ -423,7 +428,7 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     enc_.header.frame_id = odom_frame;
     enc_.child_frame_id = base_footprint_frame;
     
-    encoders_publisher.publish(enc_);
+    encoders_publisher_.publish(enc_);
 }
 
 void GazeboRosDiffDrive::publishOdometry ( double step_time )
@@ -504,4 +509,4 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
 
 GZ_REGISTER_MODEL_PLUGIN ( GazeboRosDiffDrive )
 }
-© 2020 GitHub, Inc.
+
