@@ -57,6 +57,12 @@
 
 #include <ros/ros.h>
 
+//writing into files for debugging purposes
+#include <fstream>
+
+ofstream encoders_file;
+ofstream ground_truth_file;
+
 namespace gazebo
 {
 
@@ -428,6 +434,11 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     enc_.header.frame_id = odom_frame;
     enc_.child_frame_id = base_footprint_frame;
     
+    //publish to ROS and write to file
+    
+    encoders_file.open("/Users/rodolpheperrin/Documents/Projects/Kalman_Filter_ROS/scripts/encoders.txt", std::ios::out| std::ios::app);
+    encoders_file <<enc_.header.stamp<<" "<<enc_.pose.pose.position.x<<" "<<enc_.pose.pose.position.y<<" "<<enc_.twist.twist.linear.x<<" "<<enc_.twist.twist.linear.y<<endl;
+    
     encoders_publisher_.publish(enc_);
 }
 
@@ -503,6 +514,11 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
     odom_.header.stamp = current_time;
     odom_.header.frame_id = odom_frame;
     odom_.child_frame_id = base_footprint_frame;
+    
+    // write ground truth to file and publish to ros
+    
+    ground_truth_file.open("/Users/rodolpheperrin/Documents/Projects/Kalman_Filter_ROS/scripts/ground_truth.txt", std::ios::out| std::ios::app);
+    ground_truth_file <<odom_.header.stamp<<" "<<odom_.pose.pose.position.x<<" "<<odom_.pose.pose.position.y<<" "<<odom_.twist.twist.linear.x<<" "<<odom_.twist.twist.linear.y<<endl;
 
     odometry_publisher_.publish ( odom_ );
 }
