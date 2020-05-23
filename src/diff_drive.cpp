@@ -60,6 +60,8 @@
 //writing into files for debugging purposes
 #include <fstream>
 
+using namespace std; 
+
 ofstream encoders_file;
 ofstream ground_truth_file;
 
@@ -417,7 +419,7 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     qt.setRPY ( 0,0,pose_encoder_.theta );
     vt = tf::Vector3 ( pose_encoder_.x, pose_encoder_.y, 0 );
 
-    enc_.pose.pose.position.x = vt.x();
+    enc_.pose.pose.position.x = vt.x()*1.2;
     enc_.pose.pose.position.y = vt.y();
     enc_.pose.pose.position.z = vt.z();
 
@@ -436,9 +438,9 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     
     //publish to ROS and write to file
     
-    encoders_file.open("/Users/rodolpheperrin/Documents/Projects/Kalman_Filter_ROS/scripts/encoders.txt", std::ios::out| std::ios::app);
+    encoders_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/encoders.txt", std::ios::app);
     encoders_file <<enc_.header.stamp<<" "<<enc_.pose.pose.position.x<<" "<<enc_.pose.pose.position.y<<" "<<enc_.twist.twist.linear.x<<" "<<enc_.twist.twist.linear.y<<endl;
-    
+    encoders_file.close();
     encoders_publisher_.publish(enc_);
 }
 
@@ -517,9 +519,9 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
     
     // write ground truth to file and publish to ros
     
-    ground_truth_file.open("/Users/rodolpheperrin/Documents/Projects/Kalman_Filter_ROS/scripts/ground_truth.txt", std::ios::out| std::ios::app);
+    ground_truth_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/ground_truth.txt", std::ios::app);
     ground_truth_file <<odom_.header.stamp<<" "<<odom_.pose.pose.position.x<<" "<<odom_.pose.pose.position.y<<" "<<odom_.twist.twist.linear.x<<" "<<odom_.twist.twist.linear.y<<endl;
-
+    ground_truth_file.close();
     odometry_publisher_.publish ( odom_ );
 }
 

@@ -50,5 +50,12 @@
  
  <node name="gazebo_client" pkg="gazebo_ros" type="gzclient" respawn="true" output="screen"/>
  
+ <!-- Start the drive bridge node (provides odometry). -->
+  <node name="odometry" pkg="diff_drive" type="odometry" respawn="true" output="screen">
+    <remap from="odometry/odometry" to="/odometry"/>
+    <remap from="odometry/encoders" to="/encoders"/>
+  </node>
+
+ 
 </launch>
 

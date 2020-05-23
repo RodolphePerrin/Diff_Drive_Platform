@@ -7,7 +7,7 @@
 #ifndef DIFF_DRIVE_ODOMETRY_ENCODERS_H
 #define DIFF_DRIVE_ODOMETRY_ENCODERS_H
 
-#include <diff_drive/odometry/state.h>
+#include <odometry/state.h>
 
 namespace diff_drive
 {
@@ -28,18 +28,22 @@ struct Encoders
   {
     /** @brief Reading dimension. */
     static const int dimension = 4;
+    
+      /** Measurement vector.*/
+    Eigen::Matrix<double, dimension, 1> measurement_;
 
     /** @brief Current horizontal coordinate on the global reference frame. */
-    double x;
+    double x_;
 
     /** @brief Current vertical coordinate on the global reference frame. */
-    double y;
+    double y_;
 
     /** @brief Current linear velocity along x axis. */
-    double vx;
+    double vx_;
       
     /** @brief Current linear velocity along y axis. */
-    double vy;
+    double vy_;
+    
 
     /** @brief Default constructor. */
     Reading();

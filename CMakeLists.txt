@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_dev
   message_generation
   gazebo_msgs
-  ekf_ros
 
 )
 

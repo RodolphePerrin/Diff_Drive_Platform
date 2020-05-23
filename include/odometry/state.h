@@ -9,7 +9,7 @@
 
 
 #include <eigen3/Eigen/Core>
-
+#include <vector>
 #include <iostream>
 
 namespace diff_drive
@@ -24,7 +24,7 @@ namespace odometry
 struct State
 {
   /** @brief Dimension of process state. */
-  static const int dimension = 4;x
+  static const int dimension = 4;
   /** @brief State covariance matrix type. */
   typedef Eigen::Matrix<double, dimension, dimension> Covariance;
     
@@ -35,19 +35,19 @@ struct State
   typedef Eigen::Matrix<double, dimension, dimension> Uncertainties;
     
   /** State vector.*/
-  std::vector<double> state_vector_(dimension);
+  Eigen::Matrix<double, dimension, 1> state_vector_;
 
   /** @brief Position x. */
-  double x;
+  double x_;
 
   /** @brief Position y */
-  double y;
+  double y_;
 
   /** @brief Linear horiztonal speed. */
-  double vx;
+  double vx_;
 
   /** @brief Linear vertical speed. */
-  double vy;
+  double vy_;
     
   /** @brief acceleration noise x. */
   double acc_noise_x = 9.;
@@ -79,6 +79,5 @@ struct State
 
 } // namespace diff_drive
 
-std::ostream &operator << (std::ostream &out, const diff_drive::odometry::State &state);
 
 #endif
