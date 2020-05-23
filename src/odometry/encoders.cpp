@@ -1,88 +1,72 @@
 /**
- * (C) 2019 Cyberworks Robotics, inc.
+ * (C) 2020
  *
- * @author Helio Perroni Filho
+ * @author Rodolphe Perrin
  */
 
 #include <machina/differential/odometry/encoders.h>
 
-namespace machina
-{
-
-namespace differential
+namespace diff_drive
 {
 
 namespace odometry
 {
 
 Encoders::Reading::Reading():
-  v(0.0)
+  x(0.0),
+  y(0.0),
+  vx(0.0),
+  vy(0.0)
+  {
+    // Nothing to do.
+  }
+
+Encoders::Reading::Reading(const State &state):
+  x(state.x),
+  y(state.y),
+vx(state.vx),
+vy(state.vy)
 {
   // Nothing to do.
 }
 
-Encoders::Reading::Reading(double v):
-  v(v)
+Encoders::Encoders(double s2_x, double s2_y, double s2_vx, double s2_vy)
 {
-  // Nothing to do.
-}
+    noise_(0,0) = s2_x;
+    noise_(1,1) = s2_y;
+    noise_(2,2) = s2_vx;
+    noise_(3,3) = s2_vy;
 
-Encoders::Reading::Reading(double weight_0, double weight_j, const std::vector<Encoders::Reading> &samples)
-{
-  v = weight_0 * samples[0].v;
-  for (int i = 1, n = samples.size(); i < n; ++i)
-    v += weight_j * samples[i].v;
-}
-
-Encoders::Reading::Difference Encoders::Reading::operator - (const Reading &that) const
-{
-  Difference d;
-
-  d(0) = v - that.v;
-
-  return d;
-}
-
-Encoders::Encoders(double coef_left, double coef_right, double s2_v):
-  coef_left_(coef_left),
-  coef_right_(coef_right),
-  noise_(Covariance::Constant(0.0))
-{
-  noise_(0, 0) = s2_v;
-}
 
 State Encoders::estimate() const
 {
   State state;
 
-  state.v = reading_.v;
+  state.x = reading_.x;
+  state.y = reading_.y;
+  state.vx = reading_.vx;
+  state.vy = reading_.vy;
 
   return state;
 }
 
-std::vector<Encoders::Reading> Encoders::estimate(const std::vector<State> predictions)
-{
-  std::vector<Reading> readings;
-  readings.reserve(predictions.size());
 
-  for (const State &prediction: predictions)
-    readings.emplace_back(prediction.v);
-
-  return std::move(readings);
-}
 
 const Encoders::Reading &Encoders::read() const
 {
   return reading_;
 }
 
-void Encoders::update(double dt, double ticks_left, double ticks_right)
+void Encoders::update(double x, double y, double vx, double vy)
 {
-  reading_.v = 0.5 * (ticks_left * coef_left_ + ticks_right * coef_right_) / dt;
+  reading_.x = x;
+  reading_.y = y;
+  reading_.vx = vx;
+  reading_.vy = vy;
+    
 }
+
 
 } // namespace odometry
 
-} // namespace differential
-
-} // namespace machina
+} // namespace diff_drive

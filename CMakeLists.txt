@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_dev
   message_generation
   gazebo_msgs
-
+  ekf_ros
 
 )
 
@@ -44,13 +44,15 @@ catkin_package(
    LIBRARIES
      ${PROJECT_NAME}
      diff_drive_gazebo
-  CATKIN_DEPEND
+  CATKIN_DEPENDS
      gazebo_plugins
+     nodelet
  )
 
 ###########
 ## Build ##
 ###########
+
 
 ## Specify additional locations of header files
 ## Package locations should be listed before other locations
@@ -60,6 +62,25 @@ catkin_package(
     ${catkin_INCLUDE_DIRS}
     ${GAZEBO_INCLUDE_DIRS}
  )
+
+
+# Build the odometry node for differential drive robot.
+
+add_executable(odometry
+  "src/odometry.cpp"
+  "src/odometry/state.cpp"
+  "src/odometry/encoders.cpp"
+)
+
+add_dependencies(odometry
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(odometry
+  ${catkin_LIBRARIES}
+)
+
 
 
 ## Build library diff_drive_gazebo

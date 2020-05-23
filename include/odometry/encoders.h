@@ -45,7 +45,7 @@ struct Encoders
     Reading();
 
     /** @brief Create a new reading from given linear velocity. */
-    Reading(double v);
+    Reading(const State &state);
 
   };
 
@@ -56,11 +56,6 @@ struct Encoders
    * @brief Create a new encoders model with given parameters.
    */
   Encoders(double s2_x, double s2_y, double s2_vx, double s2_vy);
-
-  /**
-   * @brief Estimate a set of readings from a set of state predictions.
-   */
-  std::vector<Reading> estimate(const std::vector<State> predictions);
 
   /**
    * @brief Estimate a CTRV state from the latest reading.
