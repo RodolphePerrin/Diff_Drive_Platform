@@ -48,7 +48,7 @@ State Encoders::estimate() const
   //Initializes all values at 0
   if(!initialized)
   {
-  std::cout<<"LOOOOL"<<std::endl;
+  //Initializing at 0 as the first displayed sometimes by the plugin is sometimes erronous. 
   state.x_ = 0.0;
   state.y_ = 0.0;
   state.vx_ = 0.0;
