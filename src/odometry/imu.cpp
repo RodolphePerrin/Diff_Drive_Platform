@@ -4,7 +4,7 @@
  * @author Rodolphe Perrin
  */
 
-#include <odometry/encoders.h>
+#include <odometry/imu.h>
 
  /** @brief Boolean to check that the encoders have been initialized */
     bool initialized = false;
@@ -15,40 +15,40 @@ namespace diff_drive
 namespace odometry
 {
 
-Encoders::Reading::Reading():
+IMU::Reading::Reading():
   x_(0.0),
   y_(0.0),
   vx_(0.0),
   vy_(0.0),
-  yaw_(0,0),
+  yaw_(0.0),
   wz(0.0)
   {
     // Nothing to do.
   }
 
-Encoders::Reading::Reading(const State &state):
+IMU::Reading::Reading(const State &state):
   x_(state.x_),
   y_(state.y_),
 vx_(state.vx_),
-vy_(state.vy_),
+vy_(state.vy_)
 yaw_(state.yaw_),
 wz_(state.wz_)
 {
   // Nothing to do.
 }
 
-Encoders::Encoders(double s2_x, double s2_y, double s2_vx, double s2_vy)
+IMU::Encoders(double s2_yaw, double s2_wz)
 {
-    noise_(0,0) = s2_x;
-    noise_(1,1) = s2_y;
-    noise_(2,2) = s2_vx;
-    noise_(3,3) = s2_vy;
-    noise_(4,4) = s2_x;
-    noise_(5,5) = 10000;
+    noise_(0,0) = s2_yaw;
+    noise_(1,1) = s2_yaw;
+    noise_(2,2) = 0.05;
+    noise_(3,3) = 0.05;
+    noise_(4,4) = s2_yaw;
+    noise(5,5) = s2_wz;
 }
 
 
-State Encoders::estimate() const
+State IMU::estimate() const
 {
   State state;
   //Initializes all values at 0
@@ -61,7 +61,7 @@ State Encoders::estimate() const
   state.vy_ = 0.0;
   state.yaw_ = 0.0;
   state.wz_ = 0.0;
-  state.state_vector_ << state.x_, state.y_, state.vx_, state.vy_, state.yaw_, state.wz_;
+      state.state_vector_ << state.x_, state.y_, state.vx_, state.vy_,state.yaw_, state.wz_;
   initialized = true;
   return state;
   }
@@ -73,26 +73,27 @@ State Encoders::estimate() const
   state.yaw_ = reading_.yaw_;
   state.wz_ = reading_.wz_;
   state.state_vector_ << state.x_, state.y_, state.vx_, state.vy_, state.yaw_, state.wz_;
+
   return state;
 }
 
 
 
-const Encoders::Reading &Encoders::read() const
+const IMU::Reading &Encoders::read() const
 {
   return reading_;
 }
 
-void Encoders::update(double x, double y, double vx, double vy, double yaw)
+void IMU::update(double t, double ax, double ay, double yaw, double wz)
 {
-  //Disregarding wz value here as not given by encoders.
-  reading_.x_ = x;
-  reading_.y_ = y;
-  reading_.vx_ = vx;
-  reading_.vy_ = vy;
-  reading_.yaw_ = yaw;
-  reading_.measurement_ << x,y,vx,vy, yaw, 0.0;
-    
+  reading_.timestamp_ = t -  reading_.timestamp_;
+  reading_.x_ = reading_.x_ +reading_.vx*reading_.timestamp_ + 0.5*ax*reading_.timestamp_*reading_.timestamp_ ;
+  reading_.y_ = reading_.y_ +reading_.vy*reading_.timestamp_ + 0.5*ay*reading_.timestamp_*reading_.timestamp_ ;
+  reading_.vx_ = reading_.vx_ + ax*t;
+  reading_.vy_ = reading_.vy_ + ay*t;
+  reading_.yaw_ = reading_.yaw_;
+  reading_.wz_ = reading_.wz_;
+    reading_.measurement_ <<reading_.x_,reading_.y_,reading_.vx_,reading_.vy_,reading_.yaw_,reading_.wz_;
 }
 
 

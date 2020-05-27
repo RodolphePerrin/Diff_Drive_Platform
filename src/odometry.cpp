@@ -7,13 +7,17 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
-#include <sensor_msgs/Imu.h>
 #include <diff_drive/Encoders.h>
+#include <sensor_msgs/Imu.h>
 #include <ekf.h>
 #include <node.h>
 
 #include <odometry/state.h>
 #include <odometry/encoders.h>
+#include <odometry/imu.h>
+
+#include <tf/LinearMath/Quaternion.h>
+
 
 //writing into files for debugging purposes
 #include <fstream>
@@ -27,17 +31,18 @@ namespace diff_drive
 
 namespace odometry
 {
-
-/**
- * @brief Retrieve a value vector from the given parameter name at the given node.
- */
-inline std::vector<double> getValues(ros::NodeHandle node, const std::string &name)
+/** @brief Get yaw angle from quaternion.*/
+double getYaw(const geometry_msgs::Quaternion &orientation)
 {
-  std::vector<double> values;
-  node.getParam(name, values);
-  return values;
-}
+  tf::Quaternion q(
+    orientation.x,
+    orientation.y,
+    orientation.z,
+    orientation.w
+  );
 
+  return tf::getYaw(q);
+}
 
 class Odometer
 {
@@ -46,6 +51,9 @@ class Odometer
 
   /** @brief Model for the wheel encoders. */
   odometry::Encoders encoders_;
+    
+  /** @brief Model for the wheel encoders. */
+  odometry::Imu imu_;
 
   /** @brief Current odometry state. */
   nav_msgs::Odometry odometry_;
@@ -57,7 +65,7 @@ class Odometer
   ros::Publisher publisher_;
 
   /**
-   * @brief Update and publish he current odometry state.
+   * @brief Update and publish the current odometry state.
    */
   void callbackEncoders(const diff_drive::EncodersConstPtr &encoders)
   {
@@ -70,7 +78,6 @@ class Odometer
 
     auto state = ekf_.getState();
     auto covariance = ekf_.getCovariance();
-    //cout<<"Covariance : "<<ekf_.getState().P_;
     double x = state.x_;
     double y = state.y_;
     double vx = state.vx_;
@@ -95,6 +102,19 @@ class Odometer
 
     publisher_.publish(odometry_);
   }
+    
+  /**
+   * @brief Update the state with Imu measurements..
+   */
+  void callbackIMU(const sensor_msgs::ImuConstPtr &imu)
+  {
+    double dt = imu->header.stamp.toSec();
+    //Extract yaw from quaternion
+      double yaw = getYaw(imu->orientation);
+
+      imu_.update(dt,imu->linear_acceleration.x, imu->linear_acceleration.y , yaw, imu->angular_velocity.z);
+      ekf_(dt, imu_);
+  }
 
 public:
   /**
@@ -103,10 +123,14 @@ public:
    */
   Odometer(ros::NodeHandle node):
     encoders_(
-     node.param("odometry/variances/x", 100000),
-     node.param("odometry/variances/y", 0.1),
-     node.param("odometry/variances/vx", 0.1),
-     node.param("odometry/variances/vy", 0.1)
+     node.param("encoders/variances/x", 100000),
+     node.param("encoders/variances/y", 0.1),
+     node.param("encoders/variances/vx", 0.1),
+     node.param("encoders/variances/vy", 0.1)
+    ),
+    imu_(
+     node.param("imu/variances/yaw", 0.1),
+     node.param("imu/variances/angular_velocity", 0.1),
     )
   {
     odometry_.header.frame_id = node.param<std::string>("frame/odometry", "odom");

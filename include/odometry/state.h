@@ -24,7 +24,7 @@ namespace odometry
 struct State
 {
   /** @brief Dimension of process state. */
-  static const int dimension = 4;
+  static const int dimension = 6;
   /** @brief State covariance matrix type. */
   typedef Eigen::Matrix<double, dimension, dimension> Covariance;
     
@@ -49,6 +49,12 @@ struct State
   /** @brief Linear vertical speed. */
   double vy_;
     
+  /** @brief yaw rotation in radians.. */
+  double yaw_;
+    
+  /** @brief Angular zl speed (turning speed). */
+  double wz_;
+    
   /** @brief acceleration noise x. */
   double acc_noise_x = 9.;
 
@@ -72,7 +78,7 @@ struct State
   /**
    * @brief Compute an initial mean state based on initial values for position and speed.
    */
-  State(double x_0, double y_0, double vx_0, double vy_0);
+  State(double x_0, double y_0, double vx_0, double vy_0, double yaw_0, double wz_0);
 };
 
 } // namespace odometry

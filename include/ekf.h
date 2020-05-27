@@ -139,6 +139,7 @@ void EKF::operator () (double timestamp, Sensor &sensor)
   //Update transition Matrix F as it depends on the time
   state_.F_(0,2) = dt;
   state_.F_(1,3) = dt;
+  state_.F(4,5) = dt;
 
   // Predict new state.
   predict(dt);
@@ -156,27 +157,34 @@ bool EKF::init(State &state)
     cout<<state_.state_vector_<<endl;
     
     //Initialize state covariance;
-    state_.P_ << 1, 0, 0, 0,
-                 0, 1, 0, 0,
-                 0, 0, 1000, 0,
-                 0, 0, 0, 1000;
-    
+    state_.P_ << 1, 0, 0, 0, 0, 0,
+                 0, 1, 0, 0, 0, 0,
+                 0, 0, 1000, 0, 0, 0,
+                 0, 0, 0, 1000, 0, 0,
+                 0, 0, 0, 0, 1, 0,
+                 0, 0, 0, 0, 0, 1;
     // Initialize transition matrix
-    state_.F_ << 1, 0, 0, 0,
-                 0, 1, 0, 0,
-                 0, 0, 1, 0,
-                 0, 0, 0, 1;
+    state_.F_ << 1, 0, 0, 0, 0, 0,
+                 0, 1, 0, 0, 0, 0,
+                 0, 0, 1, 0, 0, 0,
+                 0, 0, 0, 1, 0, 0,
+                 0, 0, 0, 0, 1, 0,
+                 0, 0, 0, 0, 0, 1;
     
     //Uncertainties are initially null.
-    state_.Q_ <<0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0;
+    state_.Q_ <<0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0;
     //Initialize Measurement matrix
-    H_<<1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1;
+    H_<<1, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0,
+        0, 0, 1, 0, 0, 0,
+        0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0;
     
 }
 
@@ -203,21 +211,25 @@ void EKF::processNoise(double dt)
   float dt4 = dt3*dt;
   float dt4over4 = dt4/4.;
   float dt3over2 = dt3/2.;
-    state_.Q_ << dt4over4* state_.acc_noise_x,                 0, dt3over2* state_.acc_noise_x,                   0,
-             0, dt4over4* state_.acc_noise_y,                 0, dt3over2* state_.acc_noise_y,
-             dt3over2* state_.acc_noise_x,                 0,      dt2* state_.acc_noise_x,                 0,
-             0, dt3over2* state_.acc_noise_y,                 0,      dt2* state_.acc_noise_y;
+    state_.Q_ << dt4over4* state_.acc_noise_x,                 0, dt3over2* state_.acc_noise_x,                   0,  0, 0,
+                 0, dt4over4* state_.acc_noise_y,                 0, dt3over2* state_.acc_noise_y,                0,  0,
+                dt3over2* state_.acc_noise_x,                 0,      dt2* state_.acc_noise_x,                 0,    0,  0,
+                0, dt3over2* state_.acc_noise_y,                 0,      dt2* state_.acc_noise_y,                    0, 0,
+                0,                             0,                0,                             0,                    0, 0,
+                0,                             0,                0,                             0,                    0, 0;
 }
 
 
 template<class Sensor>
 void EKF::update(Sensor &sensor)
 {
-    Eigen::Matrix<double, 4, 4> Identity;
-    Identity << 1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1;
+    Eigen::Matrix<double, 6, 6> Identity;
+    Identity << 1, 0, 0, 0, 0, 0,
+                0, 1, 0, 0, 0, 0,
+                0, 0, 1, 0, 0, 0,
+                0, 0, 0, 1, 0, 0,
+                0, 0, 0, 0, 1, 0,
+                0, 0, 0, 0, 0, 1;
   // Retrieve latest sensor reading.
   auto reading = sensor.read();
     Eigen::Matrix<double,State::dimension,1> y_ = reading.measurement_ - H_*state_.state_vector_ ;
@@ -231,6 +243,8 @@ void EKF::update(Sensor &sensor)
     state_.y_ =  state_.state_vector_(1);
     state_.vx_ =  state_.state_vector_(2);
     state_.vy_ =  state_.state_vector_(3);
+    state_.yaw_ = state_.state_vector_(4);
+    state_.wz_ = state_.state_vector_(5);
     state_.P_ = (Identity - K_*H_)*state_.P_;
  
 }
