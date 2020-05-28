@@ -436,6 +436,8 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     enc_.header.frame_id = odom_frame;
     enc_.child_frame_id = base_footprint_frame;
     
+
+    
     //publish to ROS and write to file
     
     encoders_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/encoders.txt", std::ios::app);
