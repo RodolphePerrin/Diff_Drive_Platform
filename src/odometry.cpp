@@ -17,6 +17,8 @@
 #include <odometry/imu.h>
 
 #include <tf/LinearMath/Quaternion.h>
+#include <tf/transform_datatypes.h>
+#include <tf/LinearMath/Matrix3x3.h>
 
 
 //writing into files for debugging purposes
@@ -122,12 +124,13 @@ class Odometer
   {
     double dt = imu->header.stamp.toSec();
     //Extract yaw from quaternion
-      double yaw = getYaw(imu->orientation);
+      double yaw_reading = getYaw(imu->orientation);
+      cout<<"yaw is : "<<yaw_reading<<endl;
 
-      imu_.update(dt,imu->linear_acceleration.x, imu->linear_acceleration.y , yaw, imu->angular_velocity.z);
-      ekf_(dt, imu_);
+      imu_.update(ros::Time::now().toSec(),imu->linear_acceleration.x, imu->linear_acceleration.y , yaw_reading, imu->angular_velocity.z);
+      ekf_(ros::Time::now().toSec(), imu_);
       
-      auto state = ekf_.getState();
+      /*auto state = ekf_.getState();
       auto covariance = ekf_.getCovariance();
       double x = state.x_;
       double y = state.y_;
@@ -159,7 +162,7 @@ class Odometer
       odometry_file.close();
 
 
-      publisher_.publish(odometry_);
+      publisher_.publish(odometry_);*/
   }
 
 public:
@@ -175,8 +178,10 @@ public:
      node.param("encoders/variances/vy", 0.1)
     ),
     imu_(
+     node.param("imu/variances/linear_acceleration_x", 10000),
+     node.param("imu/variances/linear_acceleration_y", 10000),
      node.param("imu/variances/yaw", 0.1),
-     node.param("imu/variances/angular_velocity", 0.1),
+     node.param("imu/variances/angular_velocity", 0.1)
     )
   {
     odometry_.header.frame_id = node.param<std::string>("frame/odometry", "odom");
@@ -188,7 +193,7 @@ public:
     odometry_.pose.covariance.at(0) = node.param("odometry/variances/x", 0.1);
     odometry_.pose.covariance.at(7) = node.param("odometry/variances/y", 0.1);
 
-    //encoders_sub_ = node.subscribe("encoders", 1, &Odometer::callbackEncoders, this);
+    encoders_sub_ = node.subscribe("encoders", 1, &Odometer::callbackEncoders, this);
     imu_sub_ = node.subscribe("imu/data", 1, &Odometer::callbackIMU, this);
     publisher_ = node.advertise<nav_msgs::Odometry>("odometry", 1);
   }

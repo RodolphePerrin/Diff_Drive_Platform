@@ -19,7 +19,7 @@ namespace odometry
  * @brief Model for a pair of encoders estimating linear velocity on a differential
  * drive platform.
  */
-struct IMU
+struct Imu
 {
   /**
    * @brief Single encoders reading.
@@ -68,7 +68,7 @@ struct IMU
   /**
    * @brief Create a new encoders model with given parameters.
    */
-  Encoders(double s2_yaw,  double s2_wz);
+ Imu(double s2_ax, double s2_ay, double s2_yaw, double s2_wz);
 
   /**
    * @brief Estimate a CTRV state from the latest reading.

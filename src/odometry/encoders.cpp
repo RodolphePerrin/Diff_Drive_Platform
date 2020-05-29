@@ -20,12 +20,12 @@ Encoders::Reading::Reading():
   y_(0.0),
   vx_(0.0),
   vy_(0.0),
-  yaw_(0,0),
-  wz(0.0)
+  yaw_(0.0),
+  wz_(0.0)
   {
     // Nothing to do.
   }
-
+  
 Encoders::Reading::Reading(const State &state):
   x_(state.x_),
   y_(state.y_),

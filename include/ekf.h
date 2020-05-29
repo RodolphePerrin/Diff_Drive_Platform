@@ -139,7 +139,7 @@ void EKF::operator () (double timestamp, Sensor &sensor)
   //Update transition Matrix F as it depends on the time
   state_.F_(0,2) = dt;
   state_.F_(1,3) = dt;
-  state_.F(4,5) = dt;
+  state_.F_(4,5) = dt;
 
   // Predict new state.
   predict(dt);
@@ -154,7 +154,7 @@ void EKF::operator () (double timestamp, Sensor &sensor)
 bool EKF::init(State &state)
 {
     state_ = state;
-    cout<<state_.state_vector_<<endl;
+    //cout<<state_.state_vector_<<endl;
     
     //Initialize state covariance;
     state_.P_ << 1, 0, 0, 0, 0, 0,
@@ -162,7 +162,7 @@ bool EKF::init(State &state)
                  0, 0, 1000, 0, 0, 0,
                  0, 0, 0, 1000, 0, 0,
                  0, 0, 0, 0, 1, 0,
-                 0, 0, 0, 0, 0, 1;
+                 0, 0, 0, 0, 0, 1000;
     // Initialize transition matrix
     state_.F_ << 1, 0, 0, 0, 0, 0,
                  0, 1, 0, 0, 0, 0,
@@ -199,7 +199,7 @@ void EKF::predict(double dt)
     state_.state_vector_=state_.F_*state_.state_vector_;
     Eigen::Matrix<double, State::dimension, State::dimension> F_t = state_.F_.transpose();
     state_.P_=state_.F_*state_.P_*F_t + state_.Q_;
-    cout<<"First sv:"<<state_.state_vector_<<endl;
+    //cout<<"First sv:"<<state_.state_vector_<<endl;
 }
           
 void EKF::processNoise(double dt)
@@ -238,7 +238,7 @@ void EKF::update(Sensor &sensor)
   
     //State and Covariance updated beliefs
     state_.state_vector_ = state_.state_vector_ + K_*y_;
-    cout<<K_<<endl;
+    //cout<<K_<<endl;
     state_.x_ =  state_.state_vector_(0);
     state_.y_ =  state_.state_vector_(1);
     state_.vx_ =  state_.state_vector_(2);

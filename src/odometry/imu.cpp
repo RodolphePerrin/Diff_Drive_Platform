@@ -7,7 +7,8 @@
 #include <odometry/imu.h>
 
  /** @brief Boolean to check that the encoders have been initialized */
-    bool initialized = false;
+    bool imu_initialized = false;
+    bool timestamp_initialized = false;
 
 namespace diff_drive
 {
@@ -15,44 +16,44 @@ namespace diff_drive
 namespace odometry
 {
 
-IMU::Reading::Reading():
+Imu::Reading::Reading():
   x_(0.0),
   y_(0.0),
   vx_(0.0),
   vy_(0.0),
   yaw_(0.0),
-  wz(0.0)
+  wz_(0.0)
   {
     // Nothing to do.
   }
 
-IMU::Reading::Reading(const State &state):
+Imu::Reading::Reading(const State &state):
   x_(state.x_),
   y_(state.y_),
 vx_(state.vx_),
-vy_(state.vy_)
+vy_(state.vy_),
 yaw_(state.yaw_),
 wz_(state.wz_)
 {
   // Nothing to do.
 }
 
-IMU::Encoders(double s2_yaw, double s2_wz)
+Imu::Imu(double s2_ax, double s2_ay, double s2_yaw, double s2_wz)
 {
-    noise_(0,0) = s2_yaw;
-    noise_(1,1) = s2_yaw;
-    noise_(2,2) = 0.05;
-    noise_(3,3) = 0.05;
+    noise_(0,0) = s2_ax;
+    noise_(1,1) = s2_ay;
+    noise_(2,2) = s2_ax;
+    noise_(3,3) = s2_ay;
     noise_(4,4) = s2_yaw;
-    noise(5,5) = s2_wz;
+    noise_(5,5) = s2_wz;
 }
 
 
-State IMU::estimate() const
+State Imu::estimate() const
 {
   State state;
   //Initializes all values at 0
-  if(!initialized)
+  if(!imu_initialized)
   {
   //Initializing at 0 as the first displayed sometimes by the plugin is sometimes erronous. 
   state.x_ = 0.0;
@@ -62,7 +63,7 @@ State IMU::estimate() const
   state.yaw_ = 0.0;
   state.wz_ = 0.0;
       state.state_vector_ << state.x_, state.y_, state.vx_, state.vy_,state.yaw_, state.wz_;
-  initialized = true;
+  imu_initialized = true;
   return state;
   }
   
@@ -79,21 +80,41 @@ State IMU::estimate() const
 
 
 
-const IMU::Reading &Encoders::read() const
+const Imu::Reading &Imu::read() const
 {
   return reading_;
 }
 
-void IMU::update(double t, double ax, double ay, double yaw, double wz)
+void Imu::update(double t, double ax, double ay, double yaw, double wz)
 {
-  reading_.timestamp_ = t -  reading_.timestamp_;
-  reading_.x_ = reading_.x_ +reading_.vx*reading_.timestamp_ + 0.5*ax*reading_.timestamp_*reading_.timestamp_ ;
-  reading_.y_ = reading_.y_ +reading_.vy*reading_.timestamp_ + 0.5*ay*reading_.timestamp_*reading_.timestamp_ ;
-  reading_.vx_ = reading_.vx_ + ax*t;
-  reading_.vy_ = reading_.vy_ + ay*t;
-  reading_.yaw_ = reading_.yaw_;
-  reading_.wz_ = reading_.wz_;
+  std::cout<<"initial time :"<<t<<std::endl;
+  if (!timestamp_initialized)
+  {
+      reading_.timestamp_ = t;
+      timestamp_initialized = true;
+      reading_.x_ = 0 ;
+      reading_.y_ = 0 ;
+      reading_.vx_ = 0;
+      reading_.vy_ = 0;
+      reading_.yaw_ = 0;
+      reading_.wz_ = 0;
+      reading_.measurement_ <<reading_.x_,reading_.y_,reading_.vx_,reading_.vy_,reading_.yaw_,reading_.wz_;
+      return;
+      
+  }
+  double dt = t - reading_.timestamp_;
+  reading_.timestamp_ = t;
+  reading_.x_ = 0.0;//reading_.x_ +reading_.vx_*dt + 0.5*ax*dt*dt;
+  reading_.y_ = 0.0; //reading_.y_ +reading_.vy_*dt + 0.5*ay*dt*dt;
+  reading_.vx_ = 0.0; //reading_.vx_ + ax*dt;
+  reading_.vy_ = 0.0; //reading_.vy_ + ay*dt;
+  reading_.yaw_ = yaw;
+  reading_.wz_ = wz;
     reading_.measurement_ <<reading_.x_,reading_.y_,reading_.vx_,reading_.vy_,reading_.yaw_,reading_.wz_;
+    std::cout<<reading_.measurement_<<std::endl;
+    std::cout<<reading_.timestamp_<<std::endl;
+    std::cout<<ax*dt<<std::endl;
+    std::cout<<ay*dt<<std::endl;
 }
 
 
