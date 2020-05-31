@@ -44,7 +44,7 @@ Encoders::Encoders(double s2_x, double s2_y, double s2_vx, double s2_vy)
     noise_(2,2) = s2_vx;
     noise_(3,3) = s2_vy;
     noise_(4,4) = s2_x;
-    noise_(5,5) = 10000;
+    noise_(5,5) = s2_vx;
 }
 
 
@@ -83,7 +83,7 @@ const Encoders::Reading &Encoders::read() const
   return reading_;
 }
 
-void Encoders::update(double x, double y, double vx, double vy, double yaw)
+void Encoders::update(double x, double y, double vx, double vy, double yaw, double wz)
 {
   //Disregarding wz value here as not given by encoders.
   reading_.x_ = x;
@@ -91,7 +91,8 @@ void Encoders::update(double x, double y, double vx, double vy, double yaw)
   reading_.vx_ = vx;
   reading_.vy_ = vy;
   reading_.yaw_ = yaw;
-  reading_.measurement_ << x,y,vx,vy, yaw, 0.0;
+  reading_.wz_ = wz;
+  reading_.measurement_ << x,y,vx,vy, yaw, wz;
     
 }
 

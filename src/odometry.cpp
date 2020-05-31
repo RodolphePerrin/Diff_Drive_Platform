@@ -78,7 +78,7 @@ class Odometer
 
     odometry_.header.stamp = ros::Time::now();
 
-      encoders_.update(encoders->pose.pose.position.x, encoders->pose.pose.position.y, encoders->twist.twist.linear.x, encoders-> twist.twist.linear.y, getYaw(encoders->pose.pose.orientation));
+      encoders_.update(encoders->pose.pose.position.x, encoders->pose.pose.position.y, encoders->twist.twist.linear.x, encoders-> twist.twist.linear.y, getYaw(encoders->pose.pose.orientation),encoders-> twist.twist.angular.z );
     ekf_(odometry_.header.stamp.toSec(), encoders_);
 
     auto state = ekf_.getState();
@@ -110,7 +110,7 @@ class Odometer
     odometry_.twist.covariance.at(7)  = covariance(3, 3); // vy / vy
     
     odometry_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/odometry_filtered.txt", std::ios::app);
-    odometry_file <<odometry_.header.stamp<<" "<<odometry_.pose.pose.position.x<<" "<<odometry_.pose.pose.position.y<<" "<<odometry_.twist.twist.linear.x<<" "<<odometry_.twist.twist.linear.y<<endl;
+    odometry_file <<odometry_.header.stamp<<" "<<odometry_.pose.pose.position.x<<" "<<odometry_.pose.pose.position.y<<" "<<yaw<<endl;
     odometry_file.close();
 
 
@@ -130,39 +130,6 @@ class Odometer
       imu_.update(ros::Time::now().toSec(),imu->linear_acceleration.x, imu->linear_acceleration.y , yaw_reading, imu->angular_velocity.z);
       ekf_(ros::Time::now().toSec(), imu_);
       
-      /*auto state = ekf_.getState();
-      auto covariance = ekf_.getCovariance();
-      double x = state.x_;
-      double y = state.y_;
-      double vx = state.vx_;
-      double vy = state.vy_;
-      double yaw = state.yaw_;
-      double wz = state.wz_;
-      
-      geometry_msgs::Quaternion orientation_msg;
-      tf::Quaternion q = tf::createQuaternionFromRPY(0.0, 0.0, yaw);
-      tf::quaternionTFToMsg(q, orientation_msg);
-
-      odometry_.pose.pose.position.x = x;
-      odometry_.pose.pose.position.y = y;
-      odometry_.pose.pose.orientation = orientation_msg;
-      
-      odometry_.twist.twist.linear.x = vx;
-      odometry_.twist.twist.linear.y = vy;
-      odometry_.twist.twist.angular.z = wz;
-
-      // Set odometry covariances.
-      odometry_.pose.covariance.at(0)  = covariance(0, 0); // x/x
-      odometry_.pose.covariance.at(7)  = covariance(1, 1); // y/y
-      odometry_.twist.covariance.at(0)  = covariance(2, 2); // vx / vx
-      odometry_.twist.covariance.at(7)  = covariance(3, 3); // vy / vy
-      
-      odometry_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/odometry_filtered.txt", std::ios::app);
-      odometry_file <<odometry_.header.stamp<<" "<<odometry_.pose.pose.position.x<<" "<<odometry_.pose.pose.position.y<<" "<<odometry_.twist.twist.linear.x<<" "<<odometry_.twist.twist.linear.y<<endl;
-      odometry_file.close();
-
-
-      publisher_.publish(odometry_);*/
   }
 
 public:
@@ -178,10 +145,10 @@ public:
      node.param("encoders/variances/vy", 0.1)
     ),
     imu_(
-     node.param("imu/variances/linear_acceleration_x", 10000),
-     node.param("imu/variances/linear_acceleration_y", 10000),
-     node.param("imu/variances/yaw", 0.1),
-     node.param("imu/variances/angular_velocity", 0.1)
+     node.param("imu/variances/linear_acceleration_x", 100000),
+     node.param("imu/variances/linear_acceleration_y", 100000),
+     node.param("imu/variances/yaw", 0.05),
+     node.param("imu/variances/angular_velocity", 0.01)
     )
   {
     odometry_.header.frame_id = node.param<std::string>("frame/odometry", "odom");

@@ -81,7 +81,7 @@ struct Encoders
   /**
    * @brief Update the internal reading.
    */
-  void update(double x, double y, double vx, double vy, double yaw);
+  void update(double x, double y, double vx, double vy, double yaw, double wz);
 
   /**
    * @brief Return a reference to the noise matrix.

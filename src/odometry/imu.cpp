@@ -87,7 +87,6 @@ const Imu::Reading &Imu::read() const
 
 void Imu::update(double t, double ax, double ay, double yaw, double wz)
 {
-  std::cout<<"initial time :"<<t<<std::endl;
   if (!timestamp_initialized)
   {
       reading_.timestamp_ = t;
@@ -110,11 +109,8 @@ void Imu::update(double t, double ax, double ay, double yaw, double wz)
   reading_.vy_ = 0.0; //reading_.vy_ + ay*dt;
   reading_.yaw_ = yaw;
   reading_.wz_ = wz;
-    reading_.measurement_ <<reading_.x_,reading_.y_,reading_.vx_,reading_.vy_,reading_.yaw_,reading_.wz_;
-    std::cout<<reading_.measurement_<<std::endl;
-    std::cout<<reading_.timestamp_<<std::endl;
-    std::cout<<ax*dt<<std::endl;
-    std::cout<<ay*dt<<std::endl;
+  reading_.measurement_ <<reading_.x_,reading_.y_,reading_.vx_,reading_.vy_,reading_.yaw_,reading_.wz_;
+    
 }
 
 

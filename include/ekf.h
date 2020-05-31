@@ -117,7 +117,6 @@ EKF::EKF():
 template<class Sensor>
 void EKF::operator () (double timestamp, Sensor &sensor)
 {
-  cout<<"Entering EKF."<<endl;
   if (std::isnan(timestamp_))
   {
     // Initialize state with first measurement.
@@ -125,7 +124,6 @@ void EKF::operator () (double timestamp, Sensor &sensor)
        
      state_ = sensor.estimate();
      init(state_);
-     cout<<"EKF Initialized."<<endl;
           
     // Initialize timestamp.
     timestamp_ = timestamp;
@@ -184,7 +182,7 @@ bool EKF::init(State &state)
         0, 0, 1, 0, 0, 0,
         0, 0, 0, 1, 0, 0,
         0, 0, 0, 0, 1, 0,
-        0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 1;
     
 }
 
@@ -194,6 +192,7 @@ void EKF::predict(double dt)
 {
     //Process noise covariance Matrix Q
     processNoise(dt);
+    cout<<"DT ekf : "<<dt<<endl;
     
     //Reuse Kalman filter prediction equation.
     state_.state_vector_=state_.F_*state_.state_vector_;
@@ -216,7 +215,7 @@ void EKF::processNoise(double dt)
                 dt3over2* state_.acc_noise_x,                 0,      dt2* state_.acc_noise_x,                 0,    0,  0,
                 0, dt3over2* state_.acc_noise_y,                 0,      dt2* state_.acc_noise_y,                    0, 0,
                 0,                             0,                0,                             0,                    0, 0,
-                0,                             0,                0,                             0,                    0, 0;
+                0,                             0,                0,                             0,                    0, 1000;
 }
 
 
@@ -246,6 +245,8 @@ void EKF::update(Sensor &sensor)
     state_.yaw_ = state_.state_vector_(4);
     state_.wz_ = state_.state_vector_(5);
     state_.P_ = (Identity - K_*H_)*state_.P_;
+    
+    cout<<"State vector "<<endl<<state_.state_vector_;
  
 }
 
