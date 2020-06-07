@@ -17,17 +17,22 @@ def load_odometry(path):
 def plot_odometry(path_encoders, path_ground_truth, path_filtered):
     
     encoders = load_odometry(path_encoders)
-    (t, x_encoders, y_encoders,vx, vy) = zip(*encoders)
+    (t, x_encoders, y_encoders, yaw_encoders) = zip(*encoders)
     
     ground_truth = load_odometry(path_ground_truth)
-    (t, x_truth, y_truth, vx, vy) = zip(*ground_truth)
+    (t, x_truth, y_truth, yaw_truth) = zip(*ground_truth)
     filtered = load_odometry(path_filtered)
     print(filtered)
-    (t, x_filtered, y_filtered, vx, vy) = zip(*filtered)
+    (t, x_filtered, y_filtered, yaw_filtered) = zip(*filtered)
 
     pp.plot(x_encoders, y_encoders, 'b.-')
     pp.plot(x_filtered, y_filtered, 'r,-')
     pp.plot(x_truth, y_truth, 'g.-')
+    pp.show()
+
+    pp.plot(yaw_encoders, 'b.-')
+    pp.plot(yaw_truth, 'r,-')
+    pp.plot(yaw_filtered, 'g.-')
     pp.show()
 
 
