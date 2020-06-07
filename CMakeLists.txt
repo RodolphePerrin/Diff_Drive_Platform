@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   gazebo_dev
   message_generation
   gazebo_msgs
+  tf
 
 )
 
@@ -46,6 +47,7 @@ catkin_package(
   CATKIN_DEPENDS
      gazebo_plugins
      nodelet
+     tf
  )
 
 ###########
@@ -69,6 +71,7 @@ add_executable(odometry
   "src/odometry.cpp"
   "src/odometry/state.cpp"
   "src/odometry/encoders.cpp"
+  "src/odometry/imu.cpp"
 )
 
 add_dependencies(odometry

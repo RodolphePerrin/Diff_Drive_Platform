@@ -54,6 +54,7 @@
   <node name="odometry" pkg="diff_drive" type="odometry" respawn="true" output="screen">
     <remap from="odometry/odometry" to="/odometry"/>
     <remap from="odometry/encoders" to="/encoders"/>
+    <remap from="odometry/imu/data" to="/imu/data"/>
   </node>
 
  

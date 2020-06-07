@@ -54,7 +54,7 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
-
+#include <tf/transform_datatypes.h>
 #include <ros/ros.h>
 
 //writing into files for debugging purposes
@@ -409,15 +409,18 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
 
     pose_encoder_.x += dx;
     pose_encoder_.y += dy;
-    pose_encoder_.theta += dtheta;
-
+    pose_encoder_.theta += dtheta*1.05;
     double w = dtheta/seconds_since_last_update;
     double v = sqrt ( dx*dx+dy*dy ) /seconds_since_last_update;
 
     tf::Quaternion qt;
     tf::Vector3 vt;
-    qt.setRPY ( 0,0,pose_encoder_.theta );
+    qt.setRPY ( 0,0,pose_encoder_.theta);
     vt = tf::Vector3 ( pose_encoder_.x, pose_encoder_.y, 0 );
+    
+    tf::Matrix3x3 m(qt);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
 
     enc_.pose.pose.position.x = vt.x()*1.2;
     enc_.pose.pose.position.y = vt.y();
@@ -436,10 +439,12 @@ void GazeboRosDiffDrive::UpdateOdometryEncoder()
     enc_.header.frame_id = odom_frame;
     enc_.child_frame_id = base_footprint_frame;
     
+
+    
     //publish to ROS and write to file
     
     encoders_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/encoders.txt", std::ios::app);
-    encoders_file <<enc_.header.stamp<<" "<<enc_.pose.pose.position.x<<" "<<enc_.pose.pose.position.y<<" "<<enc_.twist.twist.linear.x<<" "<<enc_.twist.twist.linear.y<<endl;
+    encoders_file <<enc_.header.stamp<<" "<<enc_.pose.pose.position.x<<" "<<enc_.pose.pose.position.y<<" "<<yaw<<endl;
     encoders_file.close();
     encoders_publisher_.publish(enc_);
 }
@@ -453,6 +458,8 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
 
     tf::Quaternion qt;
     tf::Vector3 vt;
+    
+    float yaw;
 
     if ( odom_source_ == ENCODER ) {
         // getting data form encoder integration
@@ -490,7 +497,7 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
 #endif
 
         // convert velocity to child_frame_id (aka base_footprint)
-        float yaw = pose.Rot().Yaw();
+        yaw = pose.Rot().Yaw();
         odom_.twist.twist.linear.x = cosf ( yaw ) * linear.X() + sinf ( yaw ) * linear.Y();
         odom_.twist.twist.linear.y = cosf ( yaw ) * linear.Y() - sinf ( yaw ) * linear.X();
     }
@@ -520,7 +527,7 @@ void GazeboRosDiffDrive::publishOdometry ( double step_time )
     // write ground truth to file and publish to ros
     
     ground_truth_file.open("/home/user/personal_ws/src/Diff_Drive_Platform/ressources/ground_truth.txt", std::ios::app);
-    ground_truth_file <<odom_.header.stamp<<" "<<odom_.pose.pose.position.x<<" "<<odom_.pose.pose.position.y<<" "<<odom_.twist.twist.linear.x<<" "<<odom_.twist.twist.linear.y<<endl;
+    ground_truth_file <<odom_.header.stamp<<" "<<odom_.pose.pose.position.x<<" "<<odom_.pose.pose.position.y<<" "<<yaw<<endl;
     ground_truth_file.close();
     odometry_publisher_.publish ( odom_ );
 }

@@ -4,8 +4,8 @@
  * @author Rodolphe Perrin
  */
 
-#ifndef DIFF_DRIVE_ODOMETRY_ENCODERS_H
-#define DIFF_DRIVE_ODOMETRY_ENCODERS_H
+#ifndef DIFF_DRIVE_ODOMETRY_IMU_H
+#define DIFF_DRIVE_ODOMETRY_IMU_H
 
 #include <odometry/state.h>
 
@@ -19,7 +19,7 @@ namespace odometry
  * @brief Model for a pair of encoders estimating linear velocity on a differential
  * drive platform.
  */
-struct Encoders
+struct Imu
 {
   /**
    * @brief Single encoders reading.
@@ -49,7 +49,9 @@ struct Encoders
         
     /** @brief Angular zl speed (turning speed). */
     double wz_;
-
+    
+    /** @brief timestamp */
+    double timestamp_;
     
 
     /** @brief Default constructor. */
@@ -66,7 +68,7 @@ struct Encoders
   /**
    * @brief Create a new encoders model with given parameters.
    */
-  Encoders(double s2_x, double s2_y, double s2_vx, double s2_vy);
+ Imu(double s2_ax, double s2_ay, double s2_yaw, double s2_wz);
 
   /**
    * @brief Estimate a CTRV state from the latest reading.
@@ -81,7 +83,7 @@ struct Encoders
   /**
    * @brief Update the internal reading.
    */
-  void update(double x, double y, double vx, double vy, double yaw, double wz);
+    void update(double dt, double ax, double ay, double yaw, double wz);
 
   /**
    * @brief Return a reference to the noise matrix.

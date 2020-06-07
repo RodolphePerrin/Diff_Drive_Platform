@@ -14,9 +14,9 @@ State::State(){
     //Nothing to do.
 }
 
-State::State(double x_0, double y_0, double vx_0, double vy_0)
+State::State(double x_0, double y_0, double vx_0, double vy_0, double yaw_0, double wz_0)
 {
-    state_vector_ << x_0, y_0, vx_0, vy_0;
+    state_vector_ << x_0, y_0, vx_0, vy_0, yaw_0, wz_0;
 }
 
 } // namespace odometry
